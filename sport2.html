@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTrack - 锻炼记录</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-light: #E8F5E9;
+            --secondary: #2196F3;
+            --accent: #FF9800;
+            --text: #333333;
+            --text-light: #757575;
+            --background: #FAFAFA;
+            --card: #FFFFFF;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 0;
+            border-radius: 0 0 15px 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .logo i {
+            font-size: 28px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover, nav a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            background-color: var(--primary);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #3d8b40;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #0d8aee;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .workout-list {
+            display: grid;
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .workout-item {
+            padding: 15px;
+            border-radius: 8px;
+            background-color: var(--primary-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .workout-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .workout-details {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .workout-type {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .workout-info {
+            font-size: 14px;
+            color: var(--text-light);
+            display: flex;
+            gap: 15px;
+        }
+
+        .workout-date {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .badge-primary {
+            background-color: var(--primary);
+        }
+
+        .badge-secondary {
+            background-color: var(--secondary);
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-top: 15px;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        /* 自定义滚动条 */
+        .workout-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .workout-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .workout-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .workout-list::-webkit-scrollbar-thumb:hover {
+            background: #3d8b40;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-running"></i>
+                    <span>FitTrack</span>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="sport.html">仪表盘</a></li>
+                        <li><a href="sport2.html" class="active">锻炼记录</a></li>
+                        <li><a href="sport3.html">健身计划</a></li>
+                        <li><a href="sport4.html">运动教程</a></li>
+                        <li><a href="sport5.html">成就系统</a></li>
+                    </ul>
+                </nav>
+                <div class="user-profile">
+                    <div class="avatar">JD</div>
+                    <span>John Doe</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="content-main">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">添加锻炼记录</h2>
+                    </div>
+                    <form id="workout-form">
+                        <div class="form-group">
+                            <label class="form-label" for="workout-type">锻炼类型</label>
+                            <select class="form-control" id="workout-type" required>
+                                <option value="">选择锻炼类型</option>
+                                <option value="running">跑步</option>
+                                <option value="cycling">骑行</option>
+                                <option value="swimming">游泳</option>
+                                <option value="yoga">瑜伽</option>
+                                <option value="weight-training">力量训练</option>
+                                <option value="hiit">HIIT</option>
+                                <option value="walking">步行</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="workout-duration">时长 (分钟)</label>
+                                <input type="number" class="form-control" id="workout-duration" min="1" max="300" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="workout-intensity">强度</label>
+                                <select class="form-control" id="workout-intensity" required>
+                                    <option value="">选择强度</option>
+                                    <option value="low">低强度</option>
+                                    <option value="medium">中等强度</option>
+                                    <option value="high">高强度</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="workout-calories">消耗卡路里 (千卡)</label>
+                            <input type="number" class="form-control" id="workout-calories" min="1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="workout-date">日期</label>
+                            <input type="date" class="form-control" id="workout-date" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="workout-notes">备注 (可选)</label>
+                            <textarea class="form-control" id="workout-notes" rows="3" placeholder="记录本次锻炼的感受或其他信息..."></textarea>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" class="btn">保存记录</button>
+                            <button type="reset" class="btn btn-outline">重置表单</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">锻炼统计</h2>
+                        <div>
+                            <button class="btn btn-secondary" id="week-chart-btn">周视图</button>
+                            <button class="btn" id="month-chart-btn">月视图</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="workoutChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-side">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">历史锻炼记录</h2>
+                    </div>
+                    
+                    <div class="filter-bar">
+                        <div class="filter-item">
+                            <label for="date-filter">日期筛选:</label>
+                            <input type="date" class="form-control" id="date-filter">
+                        </div>
+                        <div class="filter-item">
+                            <label for="type-filter">类型筛选:</label>
+                            <select class="form-control" id="type-filter">
+                                <option value="">全部类型</option>
+                                <option value="running">跑步</option>
+                                <option value="cycling">骑行</option>
+                                <option value="swimming">游泳</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-outline" id="clear-filter">清除筛选</button>
+                    </div>
+                    
+                    <div class="workout-list" id="workout-history">
+                        <!-- 锻炼记录将通过JavaScript动态生成 -->
+                        <div class="empty-state">
+                            <i class="fas fa-dumbbell"></i>
+                            <p>暂无锻炼记录</p>
+                            <p>添加您的第一条锻炼记录开始追踪</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>FitTrack &copy; 2023 - 您的个人健身追踪助手</p>
+        </div>
+    </footer>
+
+    <script>
+        // 示例数据 - 在实际应用中，这些数据可能来自后端API
+        let workoutRecords = [
+            {
+                id: 1,
+                type: "running",
+                typeName: "跑步",
+                duration: 30,
+                intensity: "medium",
+                calories: 250,
+                date: "2023-10-15",
+                time: "08:30"
+            },
+            {
+                id: 2,
+                type: "weight-training",
+                typeName: "力量训练",
+                duration: 45,
+                intensity: "high",
+                calories: 320,
+                date: "2023-10-14",
+                time: "18:15"
+            },
+            {
+                id: 3,
+                type: "yoga",
+                typeName: "瑜伽",
+                duration: 40,
+                intensity: "low",
+                calories: 180,
+                date: "2023-10-13",
+                time: "07:00"
+            },
+            {
+                id: 4,
+                type: "cycling",
+                typeName: "骑行",
+                duration: 60,
+                intensity: "medium",
+                calories: 400,
+                date: "2023-10-12",
+                time: "17:45"
+            },
+            {
+                id: 5,
+                type: "hiit",
+                typeName: "HIIT",
+                duration: 25,
+                intensity: "high",
+                calories: 280,
+                date: "2023-10-10",
+                time: "19:30"
+            }
+        ];
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置默认日期为今天
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('workout-date').value = today;
+            
+            // 渲染历史记录
+            renderWorkoutHistory();
+            
+            // 初始化图表
+            initWorkoutChart('week');
+            
+            // 添加表单提交事件
+            document.getElementById('workout-form').addEventListener('submit', addWorkoutRecord);
+            
+            // 添加筛选事件
+            document.getElementById('date-filter').addEventListener('change', filterWorkouts);
+            document.getElementById('type-filter').addEventListener('change', filterWorkouts);
+            document.getElementById('clear-filter').addEventListener('click', clearFilters);
+            
+            // 添加图表切换事件
+            document.getElementById('week-chart-btn').addEventListener('click', function() {
+                initWorkoutChart('week');
+                updateChartButtons('week');
+            });
+            
+            document.getElementById('month-chart-btn').addEventListener('click', function() {
+                initWorkoutChart('month');
+                updateChartButtons('month');
+            });
+        });
+
+        // 渲染历史记录
+        function renderWorkoutHistory(records = workoutRecords) {
+            const historyContainer = document.getElementById('workout-history');
+            
+            if (records.length === 0) {
+                historyContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-dumbbell"></i>
+                        <p>暂无锻炼记录</p>
+                        <p>添加您的第一条锻炼记录开始追踪</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 按日期排序（最新的在前面）
+            const sortedRecords = [...records].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            historyContainer.innerHTML = sortedRecords.map(record => `
+                <div class="workout-item">
+                    <div class="workout-details">
+                        <div class="workout-type">${record.typeName}</div>
+                        <div class="workout-info">
+                            <span>${record.duration}分钟</span>
+                            <span>${getIntensityText(record.intensity)}</span>
+                            <span>${record.calories}千卡</span>
+                        </div>
+                    </div>
+                    <div class="workout-date">${formatDate(record.date)} ${record.time}</div>
+                </div>
+            `).join('');
+        }
+
+        // 添加锻炼记录
+        function addWorkoutRecord(e) {
+            e.preventDefault();
+            
+            const typeSelect = document.getElementById('workout-type');
+            const durationInput = document.getElementById('workout-duration');
+            const intensitySelect = document.getElementById('workout-intensity');
+            const caloriesInput = document.getElementById('workout-calories');
+            const dateInput = document.getElementById('workout-date');
+            const notesInput = document.getElementById('workout-notes');
+            
+            // 创建新记录
+            const newRecord = {
+                id: workoutRecords.length > 0 ? Math.max(...workoutRecords.map(r => r.id)) + 1 : 1,
+                type: typeSelect.value,
+                typeName: typeSelect.options[typeSelect.selectedIndex].text,
+                duration: parseInt(durationInput.value),
+                intensity: intensitySelect.value,
+                calories: parseInt(caloriesInput.value),
+                date: dateInput.value,
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                notes: notesInput.value
+            };
+            
+            // 添加到记录数组
+            workoutRecords.push(newRecord);
+            
+            // 重新渲染历史记录
+            renderWorkoutHistory();
+            
+            // 重置表单
+            document.getElementById('workout-form').reset();
+            
+            // 重新设置日期为今天
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('workout-date').value = today;
+            
+            // 更新图表
+            initWorkoutChart('week');
+            
+            // 显示成功消息
+            alert('锻炼记录已成功添加！');
+        }
+
+        // 筛选锻炼记录
+        function filterWorkouts() {
+            const dateFilter = document.getElementById('date-filter').value;
+            const typeFilter = document.getElementById('type-filter').value;
+            
+            let filteredRecords = [...workoutRecords];
+            
+            if (dateFilter) {
+                filteredRecords = filteredRecords.filter(record => record.date === dateFilter);
+            }
+            
+            if (typeFilter) {
+                filteredRecords = filteredRecords.filter(record => record.type === typeFilter);
+            }
+            
+            renderWorkoutHistory(filteredRecords);
+        }
+
+        // 清除筛选
+        function clearFilters() {
+            document.getElementById('date-filter').value = '';
+            document.getElementById('type-filter').value = '';
+            renderWorkoutHistory();
+        }
+
+        // 初始化锻炼图表
+        function initWorkoutChart(period) {
+            const ctx = document.getElementById('workoutChart').getContext('2d');
+            
+            // 销毁现有图表（如果存在）
+            if (window.workoutChartInstance) {
+                window.workoutChartInstance.destroy();
+            }
+            
+            // 根据时间段准备数据
+            let labels, data;
+            
+            if (period === 'week') {
+                labels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+                data = [45, 30, 60, 25, 40, 50, 35]; // 示例数据
+            } else {
+                labels = ['第1周', '第2周', '第3周', '第4周'];
+                data = [180, 220, 190, 240]; // 示例数据
+            }
+            
+            // 创建新图表
+            window.workoutChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '锻炼时长 (分钟)',
+                        data: data,
+                        backgroundColor: '#4CAF50',
+                        borderColor: '#3d8b40',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '时长 (分钟)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: period === 'week' ? '本周锻炼统计' : '本月锻炼统计'
+                        }
+                    }
+                }
+            });
+        }
+
+        // 更新图表按钮状态
+        function updateChartButtons(activePeriod) {
+            const weekBtn = document.getElementById('week-chart-btn');
+            const monthBtn = document.getElementById('month-chart-btn');
+            
+            if (activePeriod === 'week') {
+                weekBtn.classList.add('btn-secondary');
+                monthBtn.classList.remove('btn-secondary');
+            } else {
+                weekBtn.classList.remove('btn-secondary');
+                monthBtn.classList.add('btn-secondary');
+            }
+        }
+
+        // 辅助函数：获取强度文本
+        function getIntensityText(intensity) {
+            switch(intensity) {
+                case 'low': return '低强度';
+                case 'medium': return '中等强度';
+                case 'high': return '高强度';
+                default: return intensity;
+            }
+        }
+
+        // 辅助函数：格式化日期
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            if (date.toDateString() === today.toDateString()) {
+                return '今天';
+            } else if (date.toDateString() === yesterday.toDateString()) {
+                return '昨天';
+            } else {
+                return date.toLocaleDateString('zh-CN', {month: 'short', day: 'numeric'});
+            }
+        }
+    </script>
+</body>
+</html>

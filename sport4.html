@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTrack - 运动教程</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* 头部样式 */
+        header {
+            background: linear-gradient(135deg, #4CAF50, #2196F3);
+            color: white;
+            padding: 20px 0;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .logo i {
+            font-size: 28px;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        nav a:hover, nav a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        /* 主内容区样式 */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: #3d8b40;
+            transform: translateY(-2px);
+        }
+        
+        /* 教程网格样式 */
+        .tutorials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .tutorial-card {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .tutorial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        .tutorial-image {
+            height: 160px;
+            background-color: #E8F5E9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #4CAF50;
+        }
+        
+        .tutorial-content {
+            padding: 20px;
+        }
+        
+        .tutorial-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .tutorial-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #757575;
+            margin-bottom: 15px;
+        }
+        
+        .tutorial-desc {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        /* 教程详情模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 40px auto;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .tutorial-detail-image {
+            height: 200px;
+            background-color: #E8F5E9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        
+        .detail-section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .steps-list {
+            list-style-type: decimal;
+            padding-left: 20px;
+        }
+        
+        .steps-list li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .precautions-list {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        
+        .precautions-list li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        /* 页脚样式 */
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #757575;
+            font-size: 14px;
+        }
+        
+        /* 分类筛选样式 */
+        .category-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .category-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            background-color: white;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .category-btn:hover {
+            background-color: #E8F5E9;
+        }
+        
+        .category-btn.active {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <!-- 页面头部 -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-running"></i>
+                    <span>FitTrack</span>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="sport.html">仪表盘</a></li>
+                        <li><a href="sport2.html">锻炼记录</a></li>
+                        <li><a href="sport3.html">健身计划</a></li>
+                        <li><a href="sport4.html" class="active">运动教程</a></li>
+                        <li><a href="sport5.html">成就系统</a></li>
+                    </ul>
+                </nav>
+                <div class="user-profile">
+                    <div class="avatar">JD</div>
+                    <span>John Doe</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <!-- 教程筛选 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">运动教程</h2>
+                </div>
+                
+                <!-- 分类筛选 -->
+                <div class="category-filter" id="category-filter">
+                    <!-- 分类按钮将通过JavaScript动态生成 -->
+                </div>
+                
+                <!-- 教程网格 -->
+                <div class="tutorials-grid" id="tutorials-grid">
+                    <!-- 教程卡片将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 教程详情模态框 -->
+    <div class="modal" id="tutorial-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">教程标题</h2>
+                <button class="close-btn" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 教程详情内容将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <p>FitTrack &copy; 2023 - 您的个人健身追踪助手</p>
+        </div>
+    </footer>
+
+    <script>
+        // 示例数据 - 在实际应用中，这些数据可能来自后端API
+        const tutorialCategories = [
+            { id: 'all', name: '全部' },
+            { id: 'cardio', name: '有氧运动' },
+            { id: 'strength', name: '力量训练' },
+            { id: 'yoga', name: '瑜伽' }
+        ];
+
+        const tutorials = [
+            {
+                id: 1,
+                title: 'HIIT燃脂训练',
+                category: 'cardio',
+                duration: '20分钟',
+                difficulty: '中等',
+                description: '高效燃脂训练，适合时间紧张的人群，短时间内达到最大燃脂效果。',
+                imageIcon: 'fas fa-bolt',
+                steps: [
+                    '热身：5分钟轻度有氧运动',
+                    '高强度训练：30秒全力冲刺',
+                    '恢复：30秒慢走或休息',
+                    '重复高强度与恢复环节8-10次',
+                    '冷却：5分钟轻度拉伸'
+                ],
+                precautions: [
+                    '训练前确保充分热身，避免受伤',
+                    '初学者可适当减少高强度环节时间',
+                    '保持水分补充，避免脱水'
+                ]
+            },
+            {
+                id: 2,
+                title: '核心力量训练',
+                category: 'strength',
+                duration: '30分钟',
+                difficulty: '中等',
+                description: '强化核心肌群，提高运动表现和身体稳定性。',
+                imageIcon: 'fas fa-dumbbell',
+                steps: [
+                    '平板支撑：3组，每组30-60秒',
+                    '俄罗斯转体：3组，每组15-20次',
+                    '仰卧抬腿：3组，每组12-15次',
+                    '鸟狗式：3组，每组10-12次每侧',
+                    '腹部卷曲：3组，每组15-20次'
+                ],
+                precautions: [
+                    '保持核心收紧，避免腰部受伤',
+                    '动作要缓慢控制，避免使用惯性',
+                    '呼吸要均匀，不要憋气'
+                ]
+            },
+            {
+                id: 3,
+                title: '基础瑜伽流程',
+                category: 'yoga',
+                duration: '40分钟',
+                difficulty: '简单',
+                description: '适合初学者的基础瑜伽流程，提高身体柔韧性和平衡能力。',
+                imageIcon: 'fas fa-spa',
+                steps: [
+                    '山式站立：2分钟，调整呼吸',
+                    '太阳礼拜式：重复5次',
+                    '战士一式：每侧保持30秒',
+                    '树式：每侧保持30秒',
+                    '下犬式：保持1分钟',
+                    '儿童式：保持2分钟放松'
+                ],
+                precautions: [
+                    '练习前2小时避免进食',
+                    '穿着舒适透气的衣物',
+                    '根据自身能力调整姿势深度'
+                ]
+            },
+            {
+                id: 4,
+                title: '深蹲技巧训练',
+                category: 'strength',
+                duration: '25分钟',
+                difficulty: '中等',
+                description: '掌握正确的深蹲姿势，有效锻炼下肢肌肉群。',
+                imageIcon: 'fas fa-weight-hanging',
+                steps: [
+                    '站立姿势：双脚与肩同宽，脚尖略微外展',
+                    '下蹲动作：臀部后移，膝盖与脚尖方向一致',
+                    '深度控制：大腿与地面平行或略低',
+                    '上升动作：脚跟发力，臀部收紧上升',
+                    '呼吸配合：下蹲时吸气，上升时呼气'
+                ],
+                precautions: [
+                    '保持背部挺直，避免弯腰',
+                    '膝盖不要超过脚尖',
+                    '初学者可先练习无负重深蹲'
+                ]
+            }
+        ];
+
+        // 当前选中的分类
+        let currentCategory = 'all';
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 渲染分类筛选
+            renderCategoryFilter();
+            
+            // 渲染教程网格
+            renderTutorials();
+            
+            // 添加分类点击事件
+            document.getElementById('category-filter').addEventListener('click', function(e) {
+                if (e.target.classList.contains('category-btn')) {
+                    // 更新当前选中的分类
+                    currentCategory = e.target.dataset.category;
+                    
+                    // 更新分类按钮的激活状态
+                    document.querySelectorAll('.category-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    e.target.classList.add('active');
+                    
+                    // 重新渲染教程
+                    renderTutorials();
+                }
+            });
+            
+            // 添加模态框关闭事件
+            document.getElementById('close-modal').addEventListener('click', closeModal);
+            
+            // 点击模态框外部关闭
+            document.getElementById('tutorial-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        });
+
+        // 渲染分类筛选
+        function renderCategoryFilter() {
+            const categoryFilter = document.getElementById('category-filter');
+            
+            categoryFilter.innerHTML = tutorialCategories.map(category => `
+                <button class="category-btn ${category.id === currentCategory ? 'active' : ''}" data-category="${category.id}">
+                    ${category.name}
+                </button>
+            `).join('');
+        }
+
+        // 渲染教程网格
+        function renderTutorials() {
+            const tutorialsGrid = document.getElementById('tutorials-grid');
+            
+            // 过滤教程：根据分类
+            let filteredTutorials = tutorials.filter(tutorial => {
+                return currentCategory === 'all' || tutorial.category === currentCategory;
+            });
+            
+            if (filteredTutorials.length === 0) {
+                tutorialsGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: #757575;">
+                        <i class="fas fa-search" style="font-size: 48px; margin-bottom: 15px; color: #ddd;"></i>
+                        <p>未找到相关教程</p>
+                        <p>尝试选择其他分类</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 生成教程网格HTML
+            tutorialsGrid.innerHTML = filteredTutorials.map(tutorial => `
+                <div class="tutorial-card">
+                    <div class="tutorial-image">
+                        <i class="${tutorial.imageIcon}"></i>
+                    </div>
+                    <div class="tutorial-content">
+                        <h3 class="tutorial-title">${tutorial.title}</h3>
+                        <div class="tutorial-meta">
+                            <span><i class="far fa-clock"></i> ${tutorial.duration}</span>
+                            <span><i class="fas fa-signal"></i> ${tutorial.difficulty}</span>
+                        </div>
+                        <p class="tutorial-desc">${tutorial.description}</p>
+                        <button class="btn" onclick="viewTutorial(${tutorial.id})">查看详情</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 查看教程详情
+        function viewTutorial(tutorialId) {
+            // 查找教程
+            const tutorial = tutorials.find(t => t.id === tutorialId);
+            if (!tutorial) return;
+            
+            // 更新模态框标题
+            document.getElementById('modal-title').textContent = tutorial.title;
+            
+            // 更新模态框内容
+            const modalBody = document.querySelector('.modal-body');
+            modalBody.innerHTML = `
+                <div class="tutorial-detail-image">
+                    <i class="${tutorial.imageIcon}"></i>
+                </div>
+                
+                <div class="tutorial-meta" style="margin-bottom: 20px;">
+                    <span><i class="far fa-clock"></i> ${tutorial.duration}</span>
+                    <span><i class="fas fa-signal"></i> ${tutorial.difficulty}</span>
+                    <span><i class="fas fa-tag"></i> ${getCategoryName(tutorial.category)}</span>
+                </div>
+                
+                <div class="detail-section">
+                    <h3 class="section-title">训练步骤</h3>
+                    <ol class="steps-list">
+                        ${tutorial.steps.map(step => `<li>${step}</li>`).join('')}
+                    </ol>
+                </div>
+                
+                <div class="detail-section">
+                    <h3 class="section-title">注意事项</h3>
+                    <ul class="precautions-list">
+                        ${tutorial.precautions.map(precaution => `<li>${precaution}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div style="margin-top: 25px;">
+                    <button class="btn" onclick="startTutorial(${tutorial.id})" style="width: 100%;">开始训练</button>
+                </div>
+            `;
+            
+            // 显示模态框
+            document.getElementById('tutorial-modal').style.display = 'block';
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('tutorial-modal').style.display = 'none';
+        }
+
+        // 开始训练
+        function startTutorial(tutorialId) {
+            const tutorial = tutorials.find(t => t.id === tutorialId);
+            if (tutorial) {
+                alert(`开始 "${tutorial.title}" 训练！`);
+                closeModal();
+            }
+        }
+
+        // 辅助函数：获取分类名称
+        function getCategoryName(categoryId) {
+            const category = tutorialCategories.find(c => c.id === categoryId);
+            return category ? category.name : '未知分类';
+        }
+    </script>
+</body>
+</html>

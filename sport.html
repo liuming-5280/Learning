@@ -1,0 +1,1299 @@
+<!DOCTYPE html><!--html文档5的声明-->
+<html lang="zh-CN"><!--html定义使用的语言-->
+<head>
+    <meta charset="UTF-8"><!--字符编码是将字符转换为计算机可理解的二进制数字的规则系统-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><!--标签控制网页在移动设备上的布局和缩放行为。-->
+    <title>FitTrack - 您的个人健身追踪助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!--用于在网页中引入Font Awesome图标库，让您可以使用丰富的矢量图标-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script><!--引入Chart.js库-->
+    
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-light: #E8F5E9;
+            --secondary: #2196F3;
+            --accent: #FF9800;
+            --text: #333333;
+            --text-light: #757575;
+            --background: #FAFAFA;
+            --card: #FFFFFF;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 0;
+            border-radius: 0 0 15px 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .logo i {
+            font-size: 28px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover, nav a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 25px;
+        }
+
+        .card {
+            background-color: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            background-color: var(--primary);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #3d8b40;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #0d8aee;
+        }
+
+        .today-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .chart-container {
+            height: 250px;
+            margin-top: 15px;
+        }
+
+        .progress-container {
+            margin-top: 15px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 5px;
+        }
+
+        .workout-list, .plan-list, .tutorial-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .workout-item, .plan-item, .tutorial-item {
+            padding: 15px;
+            border-radius: 8px;
+            background-color: var(--primary-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .workout-details, .plan-details {
+            display: flex;
+            gap: 15px;
+        }
+
+        .workout-type, .plan-name {
+            font-weight: 600;
+        }
+
+        .workout-info, .plan-info {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .badge-primary {
+            background-color: var(--primary);
+        }
+
+        .badge-secondary {
+            background-color: var(--secondary);
+        }
+
+        .tutorial-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .tutorial-header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .tutorial-category {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .tutorial-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .icon-btn:hover {
+            color: var(--primary);
+        }
+
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .achievement-card {
+            background-color: var(--card);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .achievement-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .achievement-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .achievement-desc {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .achievement-locked {
+            opacity: 0.5;
+        }
+
+        .achievement-locked .achievement-icon {
+            color: var(--text-light);
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .reminder-card {
+            background-color: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .reminder-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .reminder-item:last-child {
+            border-bottom: none;
+        }
+
+        .reminder-time {
+            font-weight: 600;
+        }
+
+        .reminder-desc {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 40px auto;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 20px;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-running"></i>
+                    <span>FitTrack</span>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="sport.html" class="active">仪表盘</a></li>
+                        <li><a href="sport2.html">锻炼记录</a></li>
+                        <li><a href="sport3.html">健身计划</a></li>
+                        <li><a href="sport4.html">运动教程</a></li>
+                        <li><a href="sport5.html">成就系统</a></li>
+                    </ul>
+                </nav>
+                <div class="user-profile">
+                    <div class="avatar">JD</div>
+                    <span>John Doe</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="content-main">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">今日运动数据</h2>
+                        <span>2025年10月15日</span>
+                    </div>
+                    <div class="today-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-shoe-prints" style="font-size: 24px; color: var(--primary);"></i>
+                            <div class="stat-value">8,542</div>
+                            <div class="stat-label">步数</div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-fire" style="font-size: 24px; color: var(--accent);"></i>
+                            <div class="stat-value">420</div>
+                            <div class="stat-label">消耗卡路里 (千卡)</div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-clock" style="font-size: 24px; color: var(--secondary);"></i>
+                            <div class="stat-value">45</div>
+                            <div class="stat-label">运动时长 (分钟)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">近期运动趋势</h2>
+                        <div>
+                            <button class="btn" id="week-btn">周</button>
+                            <button class="btn btn-secondary" id="month-btn">月</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">健身目标进度</h2>
+                        <button class="btn" id="set-goal-btn">设置目标</button>
+                    </div>
+                    <div class="progress-container">
+                        <div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>每日步数目标 (10,000步)</span>
+                                <span>85%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 85%;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>每周运动目标 (300分钟)</span>
+                                <span>70%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 70%;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>月度减重目标 (2kg)</span>
+                                <span>50%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 50%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">最近锻炼记录</h2>
+                        <button class="btn" id="add-record-btn">添加记录</button>
+                    </div>
+                    <div class="workout-list" id="workout-list">
+                        <div class="workout-item">
+                            <div class="workout-details">
+                                <div class="workout-type">跑步</div>
+                                <div class="workout-info">30分钟 · 中等强度 · 250千卡</div>
+                            </div>
+                            <div class="workout-date">今天 08:30</div>
+                        </div>
+                        <div class="workout-item">
+                            <div class="workout-details">
+                                <div class="workout-type">力量训练</div>
+                                <div class="workout-info">45分钟 · 高强度 · 320千卡</div>
+                            </div>
+                            <div class="workout-date">昨天 18:15</div>
+                        </div>
+                        <div class="workout-item">
+                            <div class="workout-details">
+                                <div class="workout-type">瑜伽</div>
+                                <div class="workout-info">40分钟 · 低强度 · 180千卡</div>
+                            </div>
+                            <div class="workout-date">10月13日 07:00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">我的健身计划</h2>
+                        <button class="btn" id="create-plan-btn">创建计划</button>
+                    </div>
+                    <div class="plan-list" id="plan-list">
+                        <div class="plan-item">
+                            <div class="plan-details">
+                                <div class="plan-name">减脂塑形计划</div>
+                                <div class="plan-info">每周5次 · 剩余12天</div>
+                            </div>
+                            <div class="badge badge-primary">进行中</div>
+                        </div>
+                        <div class="plan-item">
+                            <div class="plan-details">
+                                <div class="plan-name">马拉松训练</div>
+                                <div class="plan-info">每周6次 · 剩余30天</div>
+                            </div>
+                            <div class="badge badge-secondary">未开始</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">计划提醒</h2>
+                    </div>
+                    <div class="reminder-card">
+                        <div class="reminder-item">
+                            <div>
+                                <div class="reminder-time">明天 07:00</div>
+                                <div class="reminder-desc">晨跑30分钟</div>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="reminder-item">
+                            <div>
+                                <div class="reminder-time">明天 19:30</div>
+                                <div class="reminder-desc">力量训练 - 上肢</div>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="reminder-item">
+                            <div>
+                                <div class="reminder-time">后天 08:00</div>
+                                <div class="reminder-desc">瑜伽伸展</div>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">推荐教程</h2>
+                    </div>
+                    <div class="tutorial-list">
+                        <div class="tutorial-item">
+                            <div class="tutorial-header">
+                                <div class="tutorial-title">HIIT燃脂训练</div>
+                                <div class="tutorial-category">有氧运动</div>
+                            </div>
+                            <div class="tutorial-desc">20分钟高效燃脂，适合时间紧张的人群</div>
+                            <div class="tutorial-actions">
+                                <button class="icon-btn"><i class="far fa-bookmark"></i></button>
+                                <button class="btn">查看教程</button>
+                            </div>
+                        </div>
+                        <div class="tutorial-item">
+                            <div class="tutorial-header">
+                                <div class="tutorial-title">核心力量训练</div>
+                                <div class="tutorial-category">力量训练</div>
+                            </div>
+                            <div class="tutorial-desc">强化核心肌群，提高运动表现</div>
+                            <div class="tutorial-actions">
+                                <button class="icon-btn"><i class="far fa-bookmark"></i></button>
+                                <button class="btn">查看教程</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">我的成就</h2>
+                    </div>
+                    <div class="achievement-grid">
+                        <div class="achievement-card">
+                            <div class="achievement-icon"><i class="fas fa-dumbbell"></i></div>
+                            <div class="achievement-title">健身新手</div>
+                            <div class="achievement-desc">完成第一次锻炼</div>
+                        </div>
+                        <div class="achievement-card">
+                            <div class="achievement-icon"><i class="fas fa-fire"></i></div>
+                            <div class="achievement-title">燃脂达人</div>
+                            <div class="achievement-desc">单次消耗500千卡</div>
+                        </div>
+                        <div class="achievement-card achievement-locked">
+                            <div class="achievement-icon"><i class="fas fa-running"></i></div>
+                            <div class="achievement-title">马拉松选手</div>
+                            <div class="achievement-desc">连续跑步30天</div>
+                        </div>
+                        <div class="achievement-card achievement-locked">
+                            <div class="achievement-icon"><i class="fas fa-trophy"></i></div>
+                            <div class="achievement-title">健身大师</div>
+                            <div class="achievement-desc">完成100次锻炼</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加锻炼记录模态框 -->
+    <div class="modal" id="add-record-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">添加锻炼记录</h2>
+                <button class="close-btn" id="close-add-record-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-record-form">
+                    <div class="form-group">
+                        <label class="form-label" for="workout-type">锻炼类型</label>
+                        <select class="form-control" id="workout-type" required>
+                            <option value="">选择锻炼类型</option>
+                            <option value="running">跑步</option>
+                            <option value="cycling">骑行</option>
+                            <option value="swimming">游泳</option>
+                            <option value="yoga">瑜伽</option>
+                            <option value="weight-training">力量训练</option>
+                            <option value="hiit">HIIT</option>
+                            <option value="walking">步行</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="workout-duration">时长 (分钟)</label>
+                            <input type="number" class="form-control" id="workout-duration" min="1" max="300" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="workout-intensity">强度</label>
+                            <select class="form-control" id="workout-intensity" required>
+                                <option value="">选择强度</option>
+                                <option value="low">低强度</option>
+                                <option value="medium">中等强度</option>
+                                <option value="high">高强度</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="workout-calories">消耗卡路里 (千卡)</label>
+                        <input type="number" class="form-control" id="workout-calories" min="1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="workout-date">日期</label>
+                        <input type="date" class="form-control" id="workout-date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="workout-notes">备注 (可选)</label>
+                        <textarea class="form-control" id="workout-notes" rows="3" placeholder="记录本次锻炼的感受或其他信息..."></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" class="btn">保存记录</button>
+                        <button type="button" class="btn btn-outline" id="cancel-add-record">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 创建健身计划模态框 -->
+    <div class="modal" id="create-plan-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">创建健身计划</h2>
+                <button class="close-btn" id="close-create-plan-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="create-plan-form">
+                    <div class="form-group">
+                        <label class="form-label" for="plan-name">计划名称</label>
+                        <input type="text" class="form-control" id="plan-name" placeholder="例如：减脂塑形计划" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="plan-type">计划类型</label>
+                            <select class="form-control" id="plan-type" required>
+                                <option value="">选择类型</option>
+                                <option value="strength">力量训练</option>
+                                <option value="cardio">有氧运动</option>
+                                <option value="flexibility">柔韧性训练</option>
+                                <option value="weight-loss">减脂</option>
+                                <option value="muscle-gain">增肌</option>
+                                <option value="maintenance">维持</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="plan-period">计划周期</label>
+                            <select class="form-control" id="plan-period" required>
+                                <option value="">选择周期</option>
+                                <option value="daily">每日计划</option>
+                                <option value="weekly">每周计划</option>
+                                <option value="monthly">每月计划</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="plan-target">计划目标</label>
+                            <input type="text" class="form-control" id="plan-target" placeholder="例如：每周减重0.5kg" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="plan-frequency">每周频率</label>
+                            <select class="form-control" id="plan-frequency" required>
+                                <option value="">选择频率</option>
+                                <option value="1">每周1次</option>
+                                <option value="2">每周2次</option>
+                                <option value="3">每周3次</option>
+
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="plan-start">开始日期</label>
+                            <input type="date" class="form-control" id="plan-start" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="plan-duration">计划时长(周)</label>
+                            <input type="number" class="form-control" id="plan-duration" min="1" max="52" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="plan-description">计划描述 (可选)</label>
+                        <textarea class="form-control" id="plan-description" rows="3" placeholder="描述您的健身计划..."></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" class="btn">创建计划</button>
+                        <button type="button" class="btn btn-outline" id="cancel-create-plan">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设置目标模态框 -->
+    <div class="modal" id="set-goal-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">设置健身目标</h2>
+                <button class="close-btn" id="close-set-goal-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="set-goal-form">
+                    <div class="form-group">
+                        <label class="form-label" for="goal-steps">每日步数目标</label>
+                        <input type="number" class="form-control" id="goal-steps" min="1000" max="50000" value="10000" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="goal-minutes">每周运动时长目标 (分钟)</label>
+                        <input type="number" class="form-control" id="goal-minutes" min="30" max="1000" value="300" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="goal-weight">月度体重目标 (kg)</label>
+                        <input type="number" class="form-control" id="goal-weight" min="0.5" max="10" step="0.1" value="2" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="goal-calories">每日卡路里消耗目标</label>
+                        <input type="number" class="form-control" id="goal-calories" min="100" max="2000" value="500" required>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" class="btn">保存目标</button>
+                        <button type="button" class="btn btn-outline" id="cancel-set-goal">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>FitTrack &copy; 2025 - 您的个人健身追踪助手</p>
+        </div>
+    </footer>
+
+    <script>
+        // 初始化趋势图表
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        const trendChart = new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: ['10月9日', '10月10日', '10月11日', '10月12日', '10月13日', '10月14日', '今天'],
+                datasets: [{
+                    label: '步数',
+                    data: [7520, 8120, 7850, 9200, 8650, 9320, 8542],
+                    borderColor: '#4CAF50',
+                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: '运动时长(分钟)',
+                    data: [35, 40, 30, 50, 45, 55, 45],
+                    borderColor: '#2196F3',
+                    backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // 模拟收藏功能
+        document.querySelectorAll('.icon-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('far')) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    this.style.color = '#FF9800';
+                } else {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                    this.style.color = '';
+                }
+            });
+        });
+
+        // 图表切换功能
+        document.getElementById('week-btn').addEventListener('click', function() {
+            alert('切换到周视图');
+            // 在实际应用中，这里会更新图表数据
+        });
+
+        document.getElementById('month-btn').addEventListener('click', function() {
+            alert('切换到月视图');
+            // 在实际应用中，这里会更新图表数据
+        });
+
+        // 模态框功能
+        const addRecordBtn = document.getElementById('add-record-btn');
+        const createPlanBtn = document.getElementById('create-plan-btn');
+        const setGoalBtn = document.getElementById('set-goal-btn');
+        
+        const addRecordModal = document.getElementById('add-record-modal');
+        const createPlanModal = document.getElementById('create-plan-modal');
+        const setGoalModal = document.getElementById('set-goal-modal');
+        
+        const closeAddRecordModal = document.getElementById('close-add-record-modal');
+        const closeCreatePlanModal = document.getElementById('close-create-plan-modal');
+        const closeSetGoalModal = document.getElementById('close-set-goal-modal');
+        
+        const cancelAddRecord = document.getElementById('cancel-add-record');
+        const cancelCreatePlan = document.getElementById('cancel-create-plan');
+        const cancelSetGoal = document.getElementById('cancel-set-goal');
+        
+        // 打开模态框
+        addRecordBtn.addEventListener('click', function() {
+            addRecordModal.style.display = 'block';
+            // 设置默认日期为今天
+            document.getElementById('workout-date').valueAsDate = new Date();
+        });
+        
+        createPlanBtn.addEventListener('click', function() {
+            createPlanModal.style.display = 'block';
+            // 设置默认开始日期为今天
+            document.getElementById('plan-start').valueAsDate = new Date();
+        });
+        
+        setGoalBtn.addEventListener('click', function() {
+            setGoalModal.style.display = 'block';
+        });
+        
+        // 关闭模态框
+        function closeModal(modal) {
+            modal.style.display = 'none';
+        }
+        
+        closeAddRecordModal.addEventListener('click', function() {
+            closeModal(addRecordModal);
+        });
+        
+        closeCreatePlanModal.addEventListener('click', function() {
+            closeModal(createPlanModal);
+        });
+        
+        closeSetGoalModal.addEventListener('click', function() {
+            closeModal(setGoalModal);
+        });
+        
+        cancelAddRecord.addEventListener('click', function() {
+            closeModal(addRecordModal);
+        });
+        
+        cancelCreatePlan.addEventListener('click', function() {
+            closeModal(createPlanModal);
+        });
+        
+        cancelSetGoal.addEventListener('click', function() {
+            closeModal(setGoalModal);
+        });
+        
+        // 点击模态框外部关闭
+        window.addEventListener('click', function(event) {
+            if (event.target === addRecordModal) {
+                closeModal(addRecordModal);
+            }
+            if (event.target === createPlanModal) {
+                closeModal(createPlanModal);
+            }
+            if (event.target === setGoalModal) {
+                closeModal(setGoalModal);
+            }
+        });
+        
+        // 表单提交功能
+        document.getElementById('add-record-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 获取表单数据
+            const type = document.getElementById('workout-type').value;
+            const duration = document.getElementById('workout-duration').value;
+            const intensity = document.getElementById('workout-intensity').value;
+            const calories = document.getElementById('workout-calories').value;
+            const date = document.getElementById('workout-date').value;
+            const notes = document.getElementById('workout-notes').value;
+            
+            // 在实际应用中，这里会将数据发送到服务器
+            // 这里我们只是模拟添加记录
+            const workoutList = document.getElementById('workout-list');
+            const newWorkout = document.createElement('div');
+            newWorkout.className = 'workout-item';
+            
+            // 格式化日期显示
+            const workoutDate = new Date(date);
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            let dateDisplay;
+            if (workoutDate.toDateString() === today.toDateString()) {
+                dateDisplay = '今天 ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            } else if (workoutDate.toDateString() === yesterday.toDateString()) {
+                dateDisplay = '昨天 ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            } else {
+                dateDisplay = workoutDate.toLocaleDateString('zh-CN', {month: 'short', day: 'numeric'}) + ' ' + 
+                             new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            }
+            
+            // 设置强度显示文本
+            let intensityText;
+            switch(intensity) {
+                case 'low': intensityText = '低强度'; break;
+                case 'medium': intensityText = '中等强度'; break;
+                case 'high': intensityText = '高强度'; break;
+                default: intensityText = intensity;
+            }
+            
+            // 设置类型显示文本
+            let typeText;
+            switch(type) {
+                case 'running': typeText = '跑步'; break;
+                case 'cycling': typeText = '骑行'; break;
+                case 'swimming': typeText = '游泳'; break;
+                case 'yoga': typeText = '瑜伽'; break;
+                case 'weight-training': typeText = '力量训练'; break;
+                case 'hiit': typeText = 'HIIT'; break;
+                case 'walking': typeText = '步行'; break;
+                case 'other': typeText = '其他'; break;
+                default: typeText = type;
+            }
+            
+            newWorkout.innerHTML = `
+                <div class="workout-details">
+                    <div class="workout-type">${typeText}</div>
+                    <div class="workout-info">${duration}分钟 · ${intensityText} · ${calories}千卡</div>
+                </div>
+                <div class="workout-date">${dateDisplay}</div>
+            `;
+            
+            // 将新记录添加到列表顶部
+            workoutList.insertBefore(newWorkout, workoutList.firstChild);
+            
+            // 关闭模态框
+            closeModal(addRecordModal);
+            
+            // 重置表单
+            this.reset();
+            
+            // 显示成功消息
+            alert('锻炼记录已成功添加！');
+        });
+        
+        document.getElementById('create-plan-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 获取表单数据
+            const name = document.getElementById('plan-name').value;
+            const type = document.getElementById('plan-type').value;
+            const period = document.getElementById('plan-period').value;
+            const target = document.getElementById('plan-target').value;
+            const frequency = document.getElementById('plan-frequency').value;
+            const start = document.getElementById('plan-start').value;
+            const duration = document.getElementById('plan-duration').value;
+            const description = document.getElementById('plan-description').value;
+            
+            // 在实际应用中，这里会将数据发送到服务器
+            // 这里我们只是模拟创建计划
+            const planList = document.getElementById('plan-list');
+            const newPlan = document.createElement('div');
+            newPlan.className = 'plan-item';
+            
+            // 设置周期显示文本
+            let periodText;
+            switch(period) {
+                case 'daily': periodText = '每日计划'; break;
+                case 'weekly': periodText = '每周计划'; break;
+                case 'monthly': periodText = '每月计划'; break;
+                default: periodText = period;
+            }
+            
+            // 计算剩余天数
+            const startDate = new Date(start);
+            const endDate = new Date(startDate);
+            endDate.setDate(endDate.getDate() + (duration * 7)); // 转换为天数
+            const today = new Date();
+            const remainingDays = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+            
+            newPlan.innerHTML = `
+                <div class="plan-details">
+                    <div class="plan-name">${name}</div>
+                    <div class="plan-info">每周${frequency}次 · 剩余${remainingDays}天</div>
+                </div>
+                <div class="badge badge-primary">进行中</div>
+            `;
+            
+            // 将新计划添加到列表顶部
+            planList.insertBefore(newPlan, planList.firstChild);
+            
+            // 关闭模态框
+            closeModal(createPlanModal);
+            
+            // 重置表单
+            this.reset();
+            
+            // 显示成功消息
+            alert('健身计划已成功创建！');
+        });
+        
+        document.getElementById('set-goal-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 获取表单数据
+            const steps = document.getElementById('goal-steps').value;
+            const minutes = document.getElementById('goal-minutes').value;
+            const weight = document.getElementById('goal-weight').value;
+            const calories = document.getElementById('goal-calories').value;
+            
+            // 在实际应用中，这里会将数据发送到服务器
+            // 这里我们只是更新页面上的目标显示
+            document.querySelector('.progress-container').innerHTML = `
+                <div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>每日步数目标 (${steps}步)</span>
+                        <span>0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>每周运动目标 (${minutes}分钟)</span>
+                        <span>0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>月度减重目标 (${weight}kg)</span>
+                        <span>0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 0%;"></div>
+                    </div>
+                </div>
+            `;
+            
+            // 关闭模态框
+            closeModal(setGoalModal);
+            
+            // 显示成功消息
+            alert('健身目标已成功设置！');
+        });
+    </script>
+</body>
+</html>

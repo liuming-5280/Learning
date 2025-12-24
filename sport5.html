@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTrack - 成就系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* 头部样式 */
+        header {
+            background: linear-gradient(135deg, #4CAF50, #2196F3);
+            color: white;
+            padding: 20px 0;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .logo i {
+            font-size: 28px;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        nav a:hover, nav a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        /* 主内容区样式 */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: #3d8b40;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #4CAF50;
+            color: #4CAF50;
+        }
+        
+        .btn-outline:hover {
+            background-color: #E8F5E9;
+        }
+        
+        /* 成就网格样式 */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .achievement-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .achievement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        .achievement-card.locked {
+            opacity: 0.6;
+        }
+        
+        .achievement-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #4CAF50;
+        }
+        
+        .achievement-card.locked .achievement-icon {
+            color: #ccc;
+        }
+        
+        .achievement-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .achievement-desc {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .achievement-progress {
+            margin-top: 10px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #4CAF50;
+            border-radius: 4px;
+        }
+        
+        .achievement-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #FF9800;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .achievement-actions {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .icon-btn {
+            background: none;
+            border: none;
+            color: #757575;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .icon-btn:hover {
+            color: #4CAF50;
+        }
+        
+        /* 统计卡片样式 */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #4CAF50;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #757575;
+            font-size: 14px;
+        }
+        
+        /* 页脚样式 */
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #757575;
+            font-size: 14px;
+        }
+        
+        /* 分享模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 40px auto;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .share-icon {
+            font-size: 64px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        
+        .share-message {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .share-options {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .share-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .share-option:hover {
+            background-color: #E8F5E9;
+        }
+        
+        .share-option i {
+            font-size: 24px;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <!-- 页面头部 -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-running"></i>
+                    <span>FitTrack</span>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="sport.html">仪表盘</a></li>
+                        <li><a href="sport2.html">锻炼记录</a></li>
+                        <li><a href="sport3.html">健身计划</a></li>
+                        <li><a href="sport4.html">运动教程</a></li>
+                        <li><a href="sport5.html" class="active">成就系统</a></li>
+                    </ul>
+                </nav>
+                <div class="user-profile">
+                    <div class="avatar">JD</div>
+                    <span>John Doe</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <!-- 成就统计卡片 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">我的成就统计</h2>
+                </div>
+                
+                <!-- 统计卡片 -->
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <i class="fas fa-trophy" style="font-size: 24px; color: #4CAF50;"></i>
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">已解锁成就</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-lock" style="font-size: 24px; color: #757575;"></i>
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">待解锁成就</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-fire" style="font-size: 24px; color: #FF9800;"></i>
+                        <div class="stat-value">65%</div>
+                        <div class="stat-label">总完成度</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-calendar" style="font-size: 24px; color: #2196F3;"></i>
+                        <div class="stat-value">28</div>
+                        <div class="stat-label">连续训练天数</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 成就网格 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">我的成就</h2>
+                
+                </div>
+                
+                <!-- 成就网格 -->
+                <div class="achievements-grid" id="achievements-grid">
+                    <!-- 成就卡片将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 分享模态框 -->
+    <div class="modal" id="share-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">分享成就</h2>
+                <button class="close-btn" id="close-share-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="share-icon">
+                    <i class="fas fa-share-alt"></i>
+                </div>
+                <div class="share-message" id="share-message">
+                    分享您的成就给朋友！
+                </div>
+                <div class="share-options">
+                    <div class="share-option" onclick="shareToWechat()">
+                        <i class="fab fa-weixin"></i>
+                        <span>微信</span>
+                    </div>
+                    <div class="share-option" onclick="shareToWeibo()">
+                        <i class="fab fa-weibo"></i>
+                        <span>微博</span>
+                    </div>
+                    <div class="share-option" onclick="shareToQQ()">
+                        <i class="fab fa-qq"></i>
+                        <span>QQ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <p>FitTrack &copy; 2023 - 您的个人健身追踪助手</p>
+        </div>
+    </footer>
+
+    <script>
+        // 示例数据 - 在实际应用中，这些数据可能来自后端API
+        const achievements = [
+            {
+                id: 1,
+                title: '健身新手',
+                description: '完成第一次锻炼',
+                icon: 'fas fa-dumbbell',
+                unlocked: true,
+                progress: 100,
+                total: 100,
+                type: 'bronze'
+            },
+            {
+                id: 2,
+                title: '燃脂达人',
+                description: '单次锻炼消耗500卡路里',
+                icon: 'fas fa-fire',
+                unlocked: true,
+                progress: 100,
+                total: 100,
+                type: 'silver'
+            },
+            {
+                id: 3,
+                title: '马拉松选手',
+                description: '连续跑步30天',
+                icon: 'fas fa-running',
+                unlocked: false,
+                progress: 15,
+                total: 30,
+                type: 'gold'
+            },
+            {
+                id: 4,
+                title: '力量之王',
+                description: '完成100次力量训练',
+                icon: 'fas fa-weight-hanging',
+                unlocked: true,
+                progress: 100,
+                total: 100,
+                type: 'silver'
+            },
+            {
+                id: 5,
+                title: '瑜伽大师',
+                description: '完成50次瑜伽练习',
+                icon: 'fas fa-spa',
+                unlocked: false,
+                progress: 25,
+                total: 50,
+                type: 'gold'
+            },
+            {
+                id: 6,
+                title: '早起鸟儿',
+                description: '连续7天早晨锻炼',
+                icon: 'fas fa-sun',
+                unlocked: true,
+                progress: 100,
+                total: 100,
+                type: 'bronze'
+            },
+            {
+                id: 7,
+                title: '健身达人',
+                description: '完成100次锻炼',
+                icon: 'fas fa-trophy',
+                unlocked: false,
+                progress: 65,
+                total: 100,
+                type: 'platinum'
+            },
+            {
+                id: 8,
+                title: 'HIIT高手',
+                description: '完成20次HIIT训练',
+                icon: 'fas fa-bolt',
+                unlocked: true,
+                progress: 100,
+                total: 100,
+                type: 'silver'
+            }
+        ];
+
+        // 当前选中的成就（用于分享）
+        let currentAchievement = null;
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 渲染成就网格
+            renderAchievements();
+            
+            // 添加模态框关闭事件
+            document.getElementById('close-share-modal').addEventListener('click', closeShareModal);
+            
+            // 点击模态框外部关闭
+            document.getElementById('share-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeShareModal();
+                }
+            });
+        });
+
+        // 渲染成就网格
+        function renderAchievements() {
+            const achievementsGrid = document.getElementById('achievements-grid');
+            
+            // 生成成就网格HTML
+            achievementsGrid.innerHTML = achievements.map(achievement => `
+                <div class="achievement-card ${achievement.unlocked ? '' : 'locked'}">
+                    ${achievement.unlocked ? `<div class="achievement-badge">${getBadgeType(achievement.type)}</div>` : ''}
+                    <div class="achievement-icon">
+                        <i class="${achievement.icon}"></i>
+                    </div>
+                    <h3 class="achievement-title">${achievement.title}</h3>
+                    <p class="achievement-desc">${achievement.description}</p>
+                    
+                    ${achievement.unlocked ? '' : `
+                        <div class="achievement-progress">
+                            <div style="display: flex; justify-content: space-between; font-size: 14px; color: #757575;">
+                                <span>进度</span>
+                                <span>${achievement.progress}/${achievement.total}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: ${(achievement.progress / achievement.total) * 100}%;"></div>
+                            </div>
+                        </div>
+                    `}
+                    
+                    <div class="achievement-actions">
+                        ${achievement.unlocked ? `
+                            <button class="icon-btn" onclick="shareAchievement(${achievement.id})" title="分享成就">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                        ` : `
+                            <span style="color: #757575; font-size: 14px;">尚未解锁</span>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 分享成就
+        function shareAchievement(achievementId) {
+            // 查找成就
+            const achievement = achievements.find(a => a.id === achievementId);
+            if (!achievement) return;
+            
+            // 设置当前成就
+            currentAchievement = achievement;
+            
+            // 更新分享消息
+            document.getElementById('share-message').textContent = 
+                `分享我的成就：${achievement.title} - ${achievement.description}`;
+            
+            // 显示分享模态框
+            document.getElementById('share-modal').style.display = 'block';
+        }
+
+        // 关闭分享模态框
+        function closeShareModal() {
+            document.getElementById('share-modal').style.display = 'none';
+        }
+
+        // 分享到微信
+        function shareToWechat() {
+            alert(`分享"${currentAchievement.title}"到微信（模拟）`);
+            closeShareModal();
+        }
+
+        // 分享到微博
+        function shareToWeibo() {
+            alert(`分享"${currentAchievement.title}"到微博（模拟）`);
+            closeShareModal();
+        }
+
+        // 分享到QQ
+        function shareToQQ() {
+            alert(`分享"${currentAchievement.title}"到QQ（模拟）`);
+            closeShareModal();
+        }
+
+        // 辅助函数：获取徽章类型文本
+        function getBadgeType(type) {
+            switch(type) {
+                case 'bronze': return '铜牌';
+                case 'silver': return '银牌';
+                case 'gold': return '金牌';
+                case 'platinum': return '白金';
+                default: return type;
+            }
+        }
+    </script>
+</body>
+</html>
